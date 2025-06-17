@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NFT Ticketing System
 
-## Getting Started
+A decentralized NFT ticketing system built with Next.js, Hardhat, and Solidity.
 
-First, run the development server:
+## Features
 
+- Create events with name, timestamp, ticket price, and total supply
+- Mint NFT tickets (ERC-721) for events
+- View available events
+- Purchase tickets (mint NFT to wallet)
+- View owned tickets
+- Verify ticket ownership on-chain
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- npm or yarn
+- MetaMask or any Web3 wallet
+
+## Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd nft-ticketing
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Start a local Hardhat node:
+```bash
+npx hardhat node
+```
 
-## Learn More
+2. Deploy the smart contract:
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
 
-To learn more about Next.js, take a look at the following resources:
+3. Copy the deployed contract address and update it in `.env.local`:
+```
+NEXT_PUBLIC_CONTRACT_ADDRESS=<deployed-contract-address>
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Start the development server:
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Deploy on Vercel
+## Smart Contract Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Update the network configuration in `hardhat.config.js` with your preferred network details.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Deploy to the network:
+```bash
+npx hardhat run scripts/deploy.js --network <network-name>
+```
+
+## Testing
+
+Run the test suite:
+```bash
+npx hardhat test
+```
+
+## Project Structure
+
+- `/contracts` - Smart contracts
+- `/scripts` - Deployment scripts
+- `/src` - Frontend application
+  - `/app` - Next.js pages
+  - `/context` - React context providers
+  - `/artifacts` - Compiled contract artifacts
+
+## License
+
+MIT
