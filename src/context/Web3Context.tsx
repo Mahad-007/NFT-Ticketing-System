@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+'use client';
+
+import React, { createContext, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Web3Provider } from '@ethersproject/providers';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
 
@@ -8,16 +9,14 @@ const injected = new InjectedConnector({
     supportedChainIds: [1337, 1, 3, 4, 5, 42],
 });
 
-function getLibrary(provider: any): Web3Provider {
-    const library = new ethers.providers.Web3Provider(provider);
-    library.pollingInterval = 12000;
-    return library;
+function getLibrary(provider: any): ethers.BrowserProvider {
+    return new ethers.BrowserProvider(provider);
 }
 
 interface Web3ContextType {
     account: string | null;
     chainId: number | null;
-    library: Web3Provider | null;
+    library: ethers.BrowserProvider | null;
     activate: () => Promise<void>;
     deactivate: () => void;
     active: boolean;
@@ -41,11 +40,11 @@ export function Web3ProviderWrapper({ children }: { children: React.ReactNode })
 }
 
 function Web3ContextProvider({ children }: { children: React.ReactNode }) {
-    const { active, account, library, chainId, activate, deactivate } = useWeb3React<Web3Provider>();
+    const { active, account, library, chainId, activate: web3Activate, deactivate: web3Deactivate } = useWeb3React<ethers.BrowserProvider>();
 
     const connect = async () => {
         try {
-            await activate(injected);
+            await web3Activate(injected);
         } catch (error) {
             console.error('Error connecting to wallet:', error);
         }
@@ -53,7 +52,7 @@ function Web3ContextProvider({ children }: { children: React.ReactNode }) {
 
     const disconnect = () => {
         try {
-            deactivate();
+            web3Deactivate();
         } catch (error) {
             console.error('Error disconnecting from wallet:', error);
         }

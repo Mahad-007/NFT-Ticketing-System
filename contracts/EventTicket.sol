@@ -3,11 +3,10 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract EventTicket is ERC721, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+    uint256 private _nextTokenId;
+    uint256 private _nextEventId;
 
     struct Event {
         string name;
@@ -40,7 +39,7 @@ contract EventTicket is ERC721, Ownable {
         require(totalSupply > 0, "Total supply must be greater than 0");
         require(ticketPrice > 0, "Ticket price must be greater than 0");
 
-        uint256 eventId = _tokenIds.current();
+        uint256 eventId = _nextEventId;
         events[eventId] = Event({
             name: name,
             timestamp: timestamp,
@@ -51,7 +50,7 @@ contract EventTicket is ERC721, Ownable {
         });
 
         emit EventCreated(eventId, name, timestamp, ticketPrice, totalSupply);
-        _tokenIds.increment();
+        _nextEventId++;
         return eventId;
     }
 
@@ -62,14 +61,14 @@ contract EventTicket is ERC721, Ownable {
         require(msg.value >= event_.ticketPrice, "Insufficient payment");
         require(block.timestamp < event_.timestamp, "Event has already started");
 
-        uint256 tokenId = _tokenIds.current();
+        uint256 tokenId = _nextTokenId;
         _safeMint(msg.sender, tokenId);
         tokenToEvent[tokenId] = eventId;
         userTickets[msg.sender].push(tokenId);
         event_.ticketsSold++;
 
         emit TicketPurchased(msg.sender, eventId, tokenId);
-        _tokenIds.increment();
+        _nextTokenId++;
     }
 
     function getMyTickets() external view returns (uint256[] memory) {

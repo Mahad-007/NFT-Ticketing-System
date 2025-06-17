@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useWeb3 } from '@/context/Web3Context';
 import { ethers } from 'ethers';
-import EventTicket from '../../artifacts/contracts/EventTicket.sol/EventTicket.json';
+import EventTicket from '@/artifacts/contracts/EventTicket.sol/EventTicket.json';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '';
 
@@ -32,10 +32,10 @@ export default function Home() {
         eventsList.push({
           id: i,
           name: event.name,
-          timestamp: new Date(event.timestamp.toNumber() * 1000),
-          ticketPrice: ethers.utils.formatEther(event.ticketPrice),
-          totalSupply: event.totalSupply.toNumber(),
-          ticketsSold: event.ticketsSold.toNumber(),
+          timestamp: new Date(Number(event.timestamp) * 1000),
+          ticketPrice: ethers.formatEther(event.ticketPrice),
+          totalSupply: Number(event.totalSupply),
+          ticketsSold: Number(event.ticketsSold),
           isActive: event.isActive
         });
       }
@@ -51,7 +51,7 @@ export default function Home() {
     try {
       const contract = new ethers.Contract(CONTRACT_ADDRESS, EventTicket.abi, library);
       const tickets = await contract.getMyTickets();
-      setMyTickets(tickets.map((id: any) => id.toNumber()));
+      setMyTickets(tickets.map((id: any) => Number(id)));
     } catch (error) {
       console.error('Error loading tickets:', error);
     }
@@ -61,8 +61,9 @@ export default function Home() {
     if (!library || !account) return;
     try {
       setLoading(true);
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, EventTicket.abi, library.getSigner());
-      const tx = await contract.buyTicket(eventId, { value: ethers.utils.parseEther(price) });
+      const signer = await library.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, EventTicket.abi, signer);
+      const tx = await contract.buyTicket(eventId, { value: ethers.parseEther(price) });
       await tx.wait();
       await loadMyTickets();
     } catch (error) {
